@@ -8,7 +8,7 @@ import seaborn as sns
 
 
 
-project_data = "/Users/fuaad/PythonProjects/Premier League Predictive Model/PremMatches.csv"
+project_data = "/Users/fuaad/PythonProjects/Premier League Predictive Model/PremMatches2.csv"
 
 matches = pd.read_csv(project_data, index_col=0)
 
@@ -41,18 +41,19 @@ min_samples_split=100: Each internal node must have at least 100 samples to cons
 
 train = matches[matches["date"] < '2022-01-01']
 test = matches[matches["date"] > '2022-01-01']
-predictors = ["venue_code", "opp_code", "hour", "day_code", "xg", "xga", "poss", "formation_code"]
+predictors = ["venue_code", "opp_code", "hour", "day_code", "poss", "formation_code"]
 rfc.fit(train[predictors], train["result_code"])
 preds = rfc.predict(test[predictors])
 
 # calculate accuracy of the model
 error = accuracy_score(test["result_code"], preds)
-# error = 0.5833333333333334(58.3% accuracy)
+
+"""error = 0.47851153039832284(47.8% accuracy)"""
 
 
 combined = pd.DataFrame(dict(actual=test["result_code"], predicted=preds))
-# print(error)
-# print(pd.crosstab(index=combined["actual"], columns=combined["predicted"]))
+print(error)
+print(pd.crosstab(index=combined["actual"], columns=combined["predicted"]))
 # predicted  0   1   2
 # actual              
 # 0          1  26  29
@@ -84,25 +85,25 @@ later if further insights are need or wanted into class-wise performance, i can 
 
 """
 precision = precision_score(test["result_code"], preds, average='weighted',zero_division=0)
-# print("Weighted Precision:", precision)
-# weighted Precision: 0.5204146587927435(52% precision)
+print("Weighted Precision:", precision)
+"""weighted Precision: 0.377082861681235(37.7% precision)"""
+
+# grouped_matches = matches.groupby("team")
+# group = grouped_matches.get_group("Arsenal").sort_values("date")
 
 
-grouped_matches = matches.groupby("team")
-group = grouped_matches.get_group("Arsenal").sort_values("date")
-
-
-# created function to calculate rolling averages for each class
+# the function computes rolling averages for each match for each given column
 def rolling_averages(group, cols, new_cols):
-    group = group.sort_values("date") # sorts by 
+    group = group.sort_values("date") # sorts by date
     rolling_stats = group[cols].rolling(3, closed='left').mean() # closed left takes the rolling average of the matches previous weeks excluding the current week. 
     group[new_cols] = rolling_stats # assign the rolling average as a new column
     group = group.dropna(subset=new_cols) #  drop missing values
     return group
 
-cols = ["gf", "ga", "sh", "sot", "dist", "fk", "pk", "pkatt"]
+cols = ["gf", "ga", "sh", "sot", "dist", "fk", "pk", "pkatt", "poss", "xg", "xga"]
 new_cols = [f"{c}_rolling" for c in cols]
-# print(rolling_averages(group, cols, new_cols))
+
+
 
 """took our original matches data frame we grouped it by team which creates 
 one data frame for each team in our data and then we applied a function to each of those team data 
@@ -113,8 +114,8 @@ matches_rolling.index = range(matches_rolling.shape[0]) # makes sure there are o
 
 # created a funtion that will just make it easy to continue to iterate on the algorithm
 def make_predictions(data, predictors):
-    train = data[data["date"] < '2022-01-01']
-    test = data[data["date"] > '2022-01-01']
+    train = data[data["date"] < '2023-08-9']
+    test = data[data["date"] > '2023-08-10' ]
     rfc.fit(train[predictors], train["result_code"])
     preds = rfc.predict(test[predictors])
     combined = pd.DataFrame(dict(actual=test["result_code"], predicted=preds), index=test.index)
@@ -123,8 +124,8 @@ def make_predictions(data, predictors):
 
 # now we can call this function with different data and predictors
 combined, precision = make_predictions(matches_rolling, predictors + new_cols)
-# print("New Weighted Precision:"precision)
-# new precision = 0.5318373071528752(53.1% precision, improved by 1.1%)
+print("New Weighted Precision:",precision)
+"""new precision = 0.41051496669698356(41% precision, improved by 3.3%)"""
 
 
 combined = combined.merge(matches_rolling[["date", "team", "opponent", "result"]], left_index=True, right_index=True)
@@ -140,11 +141,10 @@ mapping = MissingDict(**map_values)
 combined["new_team"] = combined["team"].map(mapping)
 merged = combined.merge(combined, left_on=["date", "new_team"], right_on=["date", "opponent"])
 
-# print(merged)
 merged_x_wins_y_lose = merged[(merged["predicted_x"] == 2) & (merged["predicted_y"] ==1)]["actual_x"].value_counts()
 
 print("Predicted team x to beat team y",merged_x_wins_y_lose)
-# 68/100 percision = 68%, so big improvement with winning team prediction
+# 138/183 percision = 75%, so big improvement with winning team prediction
 
 """started out with some data on premier league matches then moved on to cleaning the data and getting it ready for
 machine learning then created an initial machine learning model with just a few predictors and a target. trained a random forest model 

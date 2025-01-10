@@ -5,7 +5,7 @@ import time
 import pandas as pd
 
 
-years = list(range(2024, 2020, -1))
+years = list(range(2024, 2019, -1))
 all_matches = []
 url = "https://fbref.com/en/comps/9/2023-2024/2023-2024-Premier-League-Stats"
 
@@ -19,9 +19,10 @@ for year in years:
     links = [l for l in links if '/squads/' in l]
     team_urls = [f"https://fbref.com{l}" for l in links]
     
-    previous_season = soup.select("a.prev")[0].get("href")
-    standings_url = f"https://fbref.com{previous_season}"
-    
+    previous_season = soup.find('a', class_='button2 prev').get("href")
+    url = f"https://fbref.com{previous_season}"
+
+
     for team_url in team_urls:
         team_name = team_url.split("/")[-1].replace("-Stats", "").replace("-", " ")
         data = requests.get(team_url)
@@ -31,7 +32,11 @@ for year in years:
         links = [l.get("href") for l in soup.find_all('a')]
         links = [l for l in links if l and '/shooting/' in l]
         data = requests.get(f"https://fbref.com{links[0]}")
-        shooting = pd.read_html(StringIO(data.text), match="Shooting")[0]
+        try:
+            shooting = pd.read_html(StringIO(data.text), match="Shooting")[0]
+        except ValueError:
+            continue
+        
         shooting.columns = shooting.columns.droplevel()
         try:
             team_data = matches.merge(shooting[["Date", "Sh", "SoT", "Dist", "FK", "PK", "PKatt"]], on="Date")
@@ -42,12 +47,13 @@ for year in years:
         team_data["Season"] = year
         team_data["Team"] = team_name
         all_matches.append(team_data)
-        time.sleep(1)
+        print(team_name)
+        # Adding a delay to prevent overwhelming the server with requests
+        time.sleep(5)
     
 match_df = pd.concat(all_matches)
 match_df.columns = [c.lower() for c in match_df.columns]
 match_df
-match_df.to_csv("TestMatches.csv")
-# match_df.to_csv("PremMatches.csv")
+match_df.to_csv("PremMatches2.csv")
 
  
