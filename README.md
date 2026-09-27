@@ -1,118 +1,33 @@
-# Premier-League-Outcome-Predictor
-This project is a comprehensive data-driven predictive model for Premier League matches. It includes data scraping, preprocessing, feature engineering, and machine learning modeling to predict match outcomes and analyse team performance trends. Achieves a final precision of 68% on outcome of match
-# Premier League Predictive Model
----
+# Premier League Match Prediction
 
-## Features
-1. **Data Scraping:**
-   - Utilizes Python's `requests` and `BeautifulSoup` libraries to scrape match statistics and shooting data from FBRef.
-   - Consolidates data into a comprehensive dataset across multiple seasons.
+A Python machine-learning experiment covering match-data collection, categorical features, rolling team statistics, and random-forest predictions.
 
-2. **Data Cleaning & Feature Engineering:**
-   - Processes scraped data to remove inconsistencies and fill missing values.
-   - Converts categorical features into numeric representations for machine learning.
-   - Adds rolling averages for key performance metrics such as goals scored, shots on target, and more.
+## Code to explore
 
-3. **Predictive Model:**
-   - Implements a **Random Forest Classifier** using `scikit-learn` to predict match results.
-   - Features engineered include venue, opponent code, expected goals (`xg`), and more.
+- [DataScraper.py](DataScraper.py): match-data collection.
+- [PredicativeModel.py](PredicativeModel.py): preprocessing, date-based train/test selection, rolling features, and evaluation.
+- [PremMatches2(2024-2019).csv](PremMatches2%282024-2019%29.csv): checked-in historical dataset.
 
-4. **Performance Evaluation:**
-   - Evaluates model performance using **accuracy** and **precision** metrics.
-   - Achieves improved precision by adding rolling averages and dual team analysis.
+The rolling features use prior matches via `rolling(3, closed='left')`. The final analysis joins predictions for both sides of a match.
 
----
+## Run locally
 
-## Setup
-### Prerequisites
-Ensure you have the following installed:
-- Python 3.8+
-- Required Python packages:
-  ```bash
-  pip install pandas numpy requests beautifulsoup4 scikit-learn matplotlib seaborn lxml
-  ```
-
-### Installation
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/username/Premier-League-Predictive-Model.git
-   ```
-2. Navigate to the project directory:
-   ```bash
-   cd Premier-League-Predictive-Model
-   ```
-3. Place the dataset `PremMatches.csv` in the project folder or scrape data using the `DataScraper.py` script.
-
----
-
-## Files
-1. **`DataScraper.py`**
-   - Scrapes Premier League match data from FBRef and saves it to a CSV file.
-   - Example usage:
-     ```bash
-     python DataScraper.py
-     ```
-
-2. **`PremMatches.csv`**
-   - Pre-scraped dataset containing match results and statistics for multiple seasons.
-
-3. **`PredicativeModel.py`**
-   - Implements the predictive model and trains a Random Forest Classifier.
-   - Includes functions for feature engineering, training, and evaluation.
-   - Example usage:
-     ```bash
-     python PredicativeModel.py
-     ```
-
----
-
-## Usage
-### Step 1: Data Scraping
-Run the `DataScraper.py` script to scrape Premier League data:
 ```bash
-python DataScraper.py
+git clone https://github.com/FuaadBashi/Premier-League-Outcome-Predictor.git
+cd Premier-League-Outcome-Predictor
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install pandas numpy requests beautifulsoup4 scikit-learn matplotlib seaborn lxml
 ```
-This script will save a CSV file containing match data to the project directory.
 
-### Step 2: Predictive Modeling
-Run the `PredicativeModel.py` script to train and evaluate the predictive model:
+Before running, change `project_data` in `PredicativeModel.py` from the original absolute path to a local CSV, for example `PremMatches2(2024-2019).csv`, and review the date split and required columns.
+
 ```bash
 python PredicativeModel.py
 ```
-### Key Results:
-- Initial precision: **52%**
-- Improved precision with rolling averages: **53.1%**
-- Final precision using dual-team analysis: **68%**
 
----
+## Interpreting the results
 
-## Technical Highlights
-1. **Rolling Averages:**
-   - Rolling averages are computed for performance metrics (e.g., goals, shots, distances) to enhance model features.
-   - Excludes the current match data to avoid data leakage.
+Weighted precision over all predictions and the win rate within a filtered subset are different quantities. Earlier README figures and source comments disagree, so this overview does not repeat a headline percentage. A reproducible result should record the dataset version, date split, class mapping, selection rule, sample count, and metric together.
 
-2. **Dual Team Analysis:**
-   - Considers both teams' predicted performances to refine match outcome predictions.
-
-3. **Custom Data Mapping:**
-   - Maps team names to ensure consistency in predictions.
-
----
-
-## Future Work
-- Add more features such as player statistics, injuries, or weather conditions.
-- Experiment with different machine learning algorithms like Gradient Boosting or Neural Networks.
-- Expand the analysis to include other leagues or competitions.
-
----
-
-## Contributors
-- **Fuaad Shurie** - Data Scientist
-
-Feel free to open issues or pull requests to contribute to this project!
-
----
-
-## License
-This project is licensed under the MIT License - see the `LICENSE` file for details.
-
+This is a historical modeling experiment, not evidence of profitable betting or future match accuracy.
