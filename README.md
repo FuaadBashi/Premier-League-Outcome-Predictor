@@ -20,10 +20,10 @@ source .venv/bin/activate
 python -m pip install pandas numpy requests beautifulsoup4 scikit-learn matplotlib seaborn lxml
 ```
 
-Before running, change `project_data` in `PredicativeModel.py` from the original absolute path to a local CSV, for example `PremMatches2(2024-2019).csv`, and review the date split and required columns.
+The default uses the bundled CSV and a 2023-08-10 split. Override them with `--data` and `--split-date`. Both evaluations use the same cutoff, including the cutoff day in the test set. Current-match possession and formation are excluded from the predictors.
 
 ```bash
-python PredicativeModel.py
+python PredicativeModel.py --split-date 2023-08-10
 ```
 
 ## Interpreting the results
