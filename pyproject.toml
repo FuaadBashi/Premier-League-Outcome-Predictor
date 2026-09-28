@@ -1,0 +1,14 @@
+[project]
+name = "premier-league-predictor"
+version = "1.0.0"
+description = "Premier League match-outcome prediction with random forests and rolling form features."
+requires-python = ">=3.10"
+
+[tool.ruff]
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP"]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]

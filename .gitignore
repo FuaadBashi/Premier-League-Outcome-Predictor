@@ -169,3 +169,10 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+# Added: build output, editor and OS files
+.venv/
+.ruff_cache/
+.DS_Store
+.idea/
+.vscode/
