@@ -16,6 +16,12 @@ Fixture + recent form      2962    757      53.5%      42.0%
 When the model predicts one side wins and the other loses: 153/245 correct (62.4%)
 ```
 
+<p align="center"><img src="docs/results.png" alt="Accuracy: baseline 39.2%, fixture only 51.3%, fixture plus recent form 53.5%. Confusion matrix: the model never predicts a draw, so all 164 draws are misses." width="820"></p>
+
+The model never predicts a draw, so every draw in the test season counts as a miss. That's the
+clearest place to improve. `python plot_results.py` regenerates the chart from a fresh run (it
+needs `matplotlib`).
+
 ## Approach
 
 1. **Data.** [`scraper.py`](scraper.py) collects each club's match log and shooting stats per
